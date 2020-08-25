@@ -16,4 +16,8 @@ class StatTracker
     @team_data = raw_data[:team_data]
     @game_teams_data = raw_data[:game_teams_data]
   end
+
+  def highest_total_score
+    game_data.map { |row| row[:away_goals].to_i + row[:home_goals].to_i }.max
+  end
 end
