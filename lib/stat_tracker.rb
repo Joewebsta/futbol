@@ -36,6 +36,10 @@ class StatTracker
     visitor_wins = game_data.select { |game| game[:away_goals] > game[:home_goals] }.count
     (visitor_wins / tot_games.to_f * 100).round(2)
   end
+
+  def percentage_ties
+    100.00 - percentage_home_wins - percentage_visitor_wins
+  end
 end
 
 game_path = './data/games.csv'
@@ -49,4 +53,4 @@ locations = {
 }
 
 stat_tracker = StatTracker.from_csv(locations)
-p stat_tracker.percentage_visitor_wins
+p stat_tracker.percentage_ties

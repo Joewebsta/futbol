@@ -11,5 +11,3 @@ locations = {
 }
 
 stat_tracker = StatTracker.from_csv(locations)
-p stat_tracker.game_data.by_col[2]
-# p stat_tracker.game_data[1][:type]
