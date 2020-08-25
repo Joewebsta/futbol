@@ -27,14 +27,14 @@ class StatTracker
 
   def percentage_home_wins
     tot_games = game_data.count
-    home_wins = game_data.select { |game| game[:home_goals] > game[:away_goals] }.count
-    (home_wins / tot_games.to_f * 100).round(2)
+    home_wins = game_data.select { |game| game[:home_goals] > game[:away_goals] }.count.to_f
+    (home_wins / tot_games * 100).round(2)
   end
 
   def percentage_visitor_wins
     tot_games = game_data.count
-    visitor_wins = game_data.select { |game| game[:away_goals] > game[:home_goals] }.count
-    (visitor_wins / tot_games.to_f * 100).round(2)
+    visitor_wins = game_data.select { |game| game[:away_goals] > game[:home_goals] }.count.to_f
+    (visitor_wins / tot_games * 100).round(2)
   end
 
   def percentage_ties
@@ -45,6 +45,15 @@ class StatTracker
     game_data.sort_by { |row| row[:season] }.each_with_object({}) do |row, hash|
       hash[row[:season]] ? hash[row[:season]] += 1 : hash[row[:season]] = 1
     end
+  end
+
+  def average_goals_per_game
+    tot_games = game_data.count
+    tot_goals = game_data.reduce(0) do |goal_count, game|
+      goal_count + game[:away_goals].to_f + game[:home_goals].to_f
+    end
+
+    p (tot_goals / tot_games).round(2)
   end
 end
 
@@ -59,4 +68,4 @@ locations = {
 }
 
 stat_tracker = StatTracker.from_csv(locations)
-pp stat_tracker.count_of_games_by_season
+stat_tracker.average_goals_per_game
