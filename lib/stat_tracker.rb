@@ -24,6 +24,12 @@ class StatTracker
   def lowest_total_score
     game_data.map { |row| row[:away_goals].to_i + row[:home_goals].to_i }.min
   end
+
+  def percentage_home_wins
+    tot_games = game_data.count
+    home_wins = game_data.select { |game| game[:home_goals] > game[:away_goals] }.count
+    (home_wins / tot_games.to_f * 100).round(2)
+  end
 end
 
 game_path = './data/games.csv'
@@ -37,4 +43,4 @@ locations = {
 }
 
 stat_tracker = StatTracker.from_csv(locations)
-p stat_tracker.lowest_total_score
+p stat_tracker.percentage_home_wins
