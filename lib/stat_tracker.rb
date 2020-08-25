@@ -40,6 +40,12 @@ class StatTracker
   def percentage_ties
     100.00 - percentage_home_wins - percentage_visitor_wins
   end
+
+  def count_of_games_by_season
+    game_data.sort_by { |row| row[:season] }.each_with_object({}) do |row, hash|
+      hash[row[:season]] ? hash[row[:season]] += 1 : hash[row[:season]] = 1
+    end
+  end
 end
 
 game_path = './data/games.csv'
@@ -53,4 +59,4 @@ locations = {
 }
 
 stat_tracker = StatTracker.from_csv(locations)
-p stat_tracker.percentage_ties
+pp stat_tracker.count_of_games_by_season
