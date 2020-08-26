@@ -47,13 +47,32 @@ class StatTracker
     end
   end
 
+  def count_of_goals_by_season
+    game_data.sort_by { |row| row[:season] }.each_with_object({}) do |row, hash|
+      if hash[row[:season]]
+        hash[row[:season]] += row[:away_goals].to_i + row[:home_goals].to_i
+      else
+        hash[row[:season]] = row[:away_goals].to_i + row[:home_goals].to_i
+      end
+    end
+  end
+
   def average_goals_per_game
     tot_games = game_data.count
     tot_goals = game_data.reduce(0) do |goal_count, game|
       goal_count + game[:away_goals].to_f + game[:home_goals].to_f
     end
 
-    p (tot_goals / tot_games).round(2)
+    (tot_goals / tot_games).round(2)
+  end
+
+  def average_goals_by_season
+    tot_goals = count_of_goals_by_season
+    tot_games = count_of_games_by_season
+
+    tot_goals.each_with_object({}) do |year, hash|
+      hash[year[0]] = (tot_goals[year[0]].to_f / tot_games[year[0]]).round(2)
+    end
   end
 end
 
@@ -68,4 +87,4 @@ locations = {
 }
 
 stat_tracker = StatTracker.from_csv(locations)
-stat_tracker.average_goals_per_game
+pp stat_tracker.average_goals_by_season
