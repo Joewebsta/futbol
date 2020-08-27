@@ -79,25 +79,25 @@ class StatTracker
     team_data.by_col[0].count
   end
 
-  def tot_goals_by_team
-    game_teams_data.sort_by { |game| game[:team_id].to_i }.each_with_object({}) do |game, hash|
-      team_id = game[:team_id]
-      hash[team_id] ? hash[team_id] += game[:goals].to_i : hash[team_id] = game[:goals].to_i
+  def tot_goals_by_team(data)
+    data.sort_by { |game| game[:team_id].to_i }.each_with_object({}) do |game, hash|
+      hash.default = 0
+      hash[game[:team_id]] += game[:goals].to_i
     end
   end
 
-  def tot_games_by_team
-    game_teams_data.sort_by { |game| game[:team_id].to_i }.each_with_object({}) do |game, hash|
-      team_id = game[:team_id]
-      hash[team_id] ? hash[team_id] += 1 : hash[team_id] = 1
+  def tot_games_by_team(data)
+    data.sort_by { |game| game[:team_id].to_i }.each_with_object({}) do |game, hash|
+      hash.default = 0
+      hash[game[:team_id]] += 1
     end
   end
 
   def avg_goals_per_game_by_team
-    tot_goals_by_team.each_with_object({}) do |team_id_goals, hash|
+    tot_goals_by_team(game_teams_data).each_with_object({}) do |team_id_goals, hash|
       team_id = team_id_goals[0]
       team_goals = team_id_goals[1].to_f
-      tot_team_games = tot_games_by_team[team_id]
+      tot_team_games = tot_games_by_team(game_teams_data)[team_id]
 
       hash[team_id] = (team_goals / tot_team_games).round(2)
     end
@@ -120,6 +120,10 @@ class StatTracker
     worst_offense_id = worst_offense_arr[0]
     team_name_by_id[worst_offense_id]
   end
+
+  def filter_by_hoa(type)
+    game_teams_data.select { |game| game[:hoa] == type }
+  end
 end
 
 game_path = './data/games.csv'
@@ -141,6 +145,6 @@ stat_tracker = StatTracker.from_csv(locations)
 # pp "Count of games by season: #{stat_tracker.count_of_games_by_season}"
 # pp "Avg goals per game: #{stat_tracker.average_goals_per_game}"
 # pp "Avg goals by season: #{stat_tracker.average_goals_by_season}"
-# pp
 # pp "Best offense: #{stat_tracker.best_offense}"
 # pp "Worst offense: #{stat_tracker.worst_offense}"
+pp stat_tracker.filter_by_hoa('home')
