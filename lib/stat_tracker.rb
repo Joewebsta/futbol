@@ -114,6 +114,12 @@ class StatTracker
     best_offense_id = best_offense_arr[0]
     team_name_by_id[best_offense_id]
   end
+
+  def worst_offense
+    worst_offense_arr = avg_goals_per_game_by_team.min_by { |_id, goals| goals }
+    worst_offense_id = worst_offense_arr[0]
+    team_name_by_id[worst_offense_id]
+  end
 end
 
 game_path = './data/games.csv'
@@ -127,7 +133,6 @@ locations = {
 }
 
 stat_tracker = StatTracker.from_csv(locations)
-stat_tracker.best_offense
 # pp "Highest total score: #{stat_tracker.highest_total_score}"
 # pp "Lowest total score: #{stat_tracker.lowest_total_score}"
 # pp "Percentage home wins: #{stat_tracker.percentage_home_wins}"
@@ -137,4 +142,5 @@ stat_tracker.best_offense
 # pp "Avg goals per game: #{stat_tracker.average_goals_per_game}"
 # pp "Avg goals by season: #{stat_tracker.average_goals_by_season}"
 # pp
-pp "Best offense: #{stat_tracker.best_offense}"
+# pp "Best offense: #{stat_tracker.best_offense}"
+# pp "Worst offense: #{stat_tracker.worst_offense}"
