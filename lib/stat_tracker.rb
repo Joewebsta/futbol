@@ -81,13 +81,15 @@ class StatTracker
 
   def tot_goals_by_team
     game_teams_data.sort_by { |game| game[:team_id].to_i }.each_with_object({}) do |game, hash|
-      hash[game[:team_id]] ? hash[game[:team_id]] += game[:goals].to_i : hash[game[:team_id]] = game[:goals].to_i
+      team_id = game[:team_id]
+      hash[team_id] ? hash[team_id] += game[:goals].to_i : hash[team_id] = game[:goals].to_i
     end
   end
 
   def tot_games_by_team
     game_teams_data.sort_by { |game| game[:team_id].to_i }.each_with_object({}) do |game, hash|
-      hash[game[:team_id]] ? hash[game[:team_id]] += 1 : hash[game[:team_id]] = 1
+      team_id = game[:team_id]
+      hash[team_id] ? hash[team_id] += 1 : hash[team_id] = 1
     end
   end
 
