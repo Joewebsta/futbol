@@ -169,6 +169,11 @@ class StatTracker
     winningest_team_id = win_percent_by_team.max_by { |_id, win_percent| win_percent }[0]
     game_teams_data.find { |game| game[:team_id] == winningest_team_id }[:head_coach]
   end
+
+  def worst_coach
+    worst_team_id = win_percent_by_team.min_by { |_id, win_percent| win_percent }[0]
+    game_teams_data.find { |game| game[:team_id] == worst_team_id }[:head_coach]
+  end
   # Can I refactor any methods above to use find?
 end
 
@@ -200,3 +205,4 @@ stat_tracker = StatTracker.from_csv(locations)
 # pp "Lowest scoring home team: #{stat_tracker.lowest_scoring_home_team}"
 # puts '_______________________________'
 # pp "Winningest coach: #{stat_tracker.winningest_coach}"
+pp "Worst coach: #{stat_tracker.worst_coach}"
