@@ -136,6 +136,18 @@ class StatTracker
     lowest_scoring_visitor_by_id = avg_goals_per_game_by_team(away_games_arr).min_by { |_id, goals| goals }[0]
     team_name_by_id[lowest_scoring_visitor_by_id]
   end
+
+  def highest_scoring_home_team
+    home_games = filter_by_hoa('home')
+    high_scoring_home_team_id = avg_goals_per_game_by_team(home_games).max_by { |_id, goals| goals }[0]
+    team_name_by_id[high_scoring_home_team_id]
+  end
+
+  def lowest_scoring_home_team
+    home_games = filter_by_hoa('home')
+    low_scoring_home_team_id = avg_goals_per_game_by_team(home_games).min_by { |_id, goals| goals }[0]
+    team_name_by_id[low_scoring_home_team_id]
+  end
 end
 
 game_path = './data/games.csv'
@@ -158,7 +170,9 @@ stat_tracker = StatTracker.from_csv(locations)
 # pp "Avg goals per game: #{stat_tracker.average_goals_per_game}"
 # pp "Avg goals by season: #{stat_tracker.average_goals_by_season}"
 # puts '_______________________________'
-# pp "Best offense: #{stat_tracker.best_offense}"
-# pp "Worst offense: #{stat_tracker.worst_offense}"
-# pp "Highest scoring visitor: #{stat_tracker.highest_scoring_visitor}"
-# pp "Lowest scoring visitor: #{stat_tracker.lowest_scoring_visitor}"
+pp "Best offense: #{stat_tracker.best_offense}"
+pp "Worst offense: #{stat_tracker.worst_offense}"
+pp "Highest scoring visitor: #{stat_tracker.highest_scoring_visitor}"
+pp "Lowest scoring visitor: #{stat_tracker.lowest_scoring_visitor}"
+pp "Highest scoring home team: #{stat_tracker.highest_scoring_home_team}"
+pp "Lowest scoring home team: #{stat_tracker.lowest_scoring_home_team}"
