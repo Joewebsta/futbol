@@ -74,6 +74,36 @@ class StatTracker
       hash[year[0]] = (tot_goals[year[0]].to_f / tot_games[year[0]]).round(2)
     end
   end
+
+  def count_of_teams
+    team_data.by_col[0].count
+  end
+
+  def best_offense
+    tot_goals_by_team = game_teams_data.sort_by { |game| game[:team_id].to_i }.each_with_object({}) do |game, hash|
+      hash[game[:team_id]] ? hash[game[:team_id]] += game[:goals].to_i : hash[game[:team_id]] = game[:goals].to_i
+    end
+
+    tot_games_by_team = game_teams_data.sort_by { |game| game[:team_id].to_i }.each_with_object({}) do |game, hash|
+      hash[game[:team_id]] ? hash[game[:team_id]] += 1 : hash[game[:team_id]] = 1
+    end
+
+    avg_goals_per_game_by_team = tot_goals_by_team.each_with_object({}) do |team_id_goals, hash|
+      team_id = team_id_goals[0]
+      team_goals = team_id_goals[1].to_f
+      tot_team_games = tot_games_by_team[team_id]
+
+      hash[team_id] = (team_goals / tot_team_games).round(2)
+    end
+
+    team_name_by_id = team_data.sort_by { |row| row[:team_id].to_i }.each_with_object({}) do |row, hash|
+      hash[row[:team_id]] = row[:teamname]
+    end
+
+    best_offense_by_id = avg_goals_per_game_by_team.max_by { |_id, goals| goals }
+
+    team_name_by_id[best_offense_by_id[0]]
+  end
 end
 
 game_path = './data/games.csv'
@@ -87,4 +117,14 @@ locations = {
 }
 
 stat_tracker = StatTracker.from_csv(locations)
-pp stat_tracker.average_goals_by_season
+stat_tracker.best_offense
+# pp "Highest total score: #{stat_tracker.highest_total_score}"
+# pp "Lowest total score: #{stat_tracker.lowest_total_score}"
+# pp "Percentage home wins: #{stat_tracker.percentage_home_wins}"
+# pp "Percentage visitor wins: #{stat_tracker.percentage_visitor_wins}"
+# pp "Percentage ties: #{stat_tracker.percentage_ties}"
+# pp "Count of games by season: #{stat_tracker.count_of_games_by_season}"
+# pp "Avg goals per game: #{stat_tracker.average_goals_per_game}"
+# pp "Avg goals by season: #{stat_tracker.average_goals_by_season}"
+# pp
+pp "Best offense: #{stat_tracker.best_offense}"
