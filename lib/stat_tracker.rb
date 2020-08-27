@@ -18,11 +18,11 @@ class StatTracker
   end
 
   def highest_total_score
-    game_data.map { |row| row[:away_goals].to_i + row[:home_goals].to_i }.max
+    game_data.map { |game| game[:away_goals].to_i + game[:home_goals].to_i }.max
   end
 
   def lowest_total_score
-    game_data.map { |row| row[:away_goals].to_i + row[:home_goals].to_i }.min
+    game_data.map { |game| game[:away_goals].to_i + game[:home_goals].to_i }.min
   end
 
   def percentage_home_wins
@@ -42,18 +42,16 @@ class StatTracker
   end
 
   def count_of_games_by_season
-    game_data.sort_by { |row| row[:season] }.each_with_object({}) do |row, hash|
-      hash[row[:season]] ? hash[row[:season]] += 1 : hash[row[:season]] = 1
+    game_data.sort_by { |game| game[:season] }.each_with_object({}) do |game, hash|
+      hash.default = 0
+      hash[game[:season]] += 1
     end
   end
 
   def count_of_goals_by_season
     game_data.sort_by { |row| row[:season] }.each_with_object({}) do |row, hash|
-      if hash[row[:season]]
-        hash[row[:season]] += row[:away_goals].to_i + row[:home_goals].to_i
-      else
-        hash[row[:season]] = row[:away_goals].to_i + row[:home_goals].to_i
-      end
+      hash.default = 0
+      hash[row[:season]] += (row[:away_goals].to_i + row[:home_goals].to_i)
     end
   end
 
@@ -70,8 +68,9 @@ class StatTracker
     tot_goals = count_of_goals_by_season
     tot_games = count_of_games_by_season
 
-    tot_goals.each_with_object({}) do |year, hash|
-      hash[year[0]] = (tot_goals[year[0]].to_f / tot_games[year[0]]).round(2)
+    tot_goals.each_with_object({}) do |season_goals_arr, hash|
+      season = season_goals_arr[0]
+      hash[season] = (tot_goals[season].to_f / tot_games[season]).round(2)
     end
   end
 
@@ -168,11 +167,11 @@ stat_tracker = StatTracker.from_csv(locations)
 # pp "Percentage ties: #{stat_tracker.percentage_ties}"
 # pp "Count of games by season: #{stat_tracker.count_of_games_by_season}"
 # pp "Avg goals per game: #{stat_tracker.average_goals_per_game}"
-# pp "Avg goals by season: #{stat_tracker.average_goals_by_season}"
+# p "Avg goals by season: #{stat_tracker.average_goals_by_season}"
 # puts '_______________________________'
-pp "Best offense: #{stat_tracker.best_offense}"
-pp "Worst offense: #{stat_tracker.worst_offense}"
-pp "Highest scoring visitor: #{stat_tracker.highest_scoring_visitor}"
-pp "Lowest scoring visitor: #{stat_tracker.lowest_scoring_visitor}"
-pp "Highest scoring home team: #{stat_tracker.highest_scoring_home_team}"
-pp "Lowest scoring home team: #{stat_tracker.lowest_scoring_home_team}"
+# pp "Best offense: #{stat_tracker.best_offense}"
+# pp "Worst offense: #{stat_tracker.worst_offense}"
+# pp "Highest scoring visitor: #{stat_tracker.highest_scoring_visitor}"
+# pp "Lowest scoring visitor: #{stat_tracker.lowest_scoring_visitor}"
+# pp "Highest scoring home team: #{stat_tracker.highest_scoring_home_team}"
+# pp "Lowest scoring home team: #{stat_tracker.lowest_scoring_home_team}"
