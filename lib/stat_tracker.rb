@@ -79,30 +79,38 @@ class StatTracker
     team_data.by_col[0].count
   end
 
-  def best_offense
-    tot_goals_by_team = game_teams_data.sort_by { |game| game[:team_id].to_i }.each_with_object({}) do |game, hash|
+  def tot_goals_by_team
+    game_teams_data.sort_by { |game| game[:team_id].to_i }.each_with_object({}) do |game, hash|
       hash[game[:team_id]] ? hash[game[:team_id]] += game[:goals].to_i : hash[game[:team_id]] = game[:goals].to_i
     end
+  end
 
-    tot_games_by_team = game_teams_data.sort_by { |game| game[:team_id].to_i }.each_with_object({}) do |game, hash|
+  def tot_games_by_team
+    game_teams_data.sort_by { |game| game[:team_id].to_i }.each_with_object({}) do |game, hash|
       hash[game[:team_id]] ? hash[game[:team_id]] += 1 : hash[game[:team_id]] = 1
     end
+  end
 
-    avg_goals_per_game_by_team = tot_goals_by_team.each_with_object({}) do |team_id_goals, hash|
+  def avg_goals_per_game_by_team
+    tot_goals_by_team.each_with_object({}) do |team_id_goals, hash|
       team_id = team_id_goals[0]
       team_goals = team_id_goals[1].to_f
       tot_team_games = tot_games_by_team[team_id]
 
       hash[team_id] = (team_goals / tot_team_games).round(2)
     end
+  end
 
-    team_name_by_id = team_data.sort_by { |row| row[:team_id].to_i }.each_with_object({}) do |row, hash|
+  def team_name_by_id
+    team_data.sort_by { |row| row[:team_id].to_i }.each_with_object({}) do |row, hash|
       hash[row[:team_id]] = row[:teamname]
     end
+  end
 
-    best_offense_by_id = avg_goals_per_game_by_team.max_by { |_id, goals| goals }
-
-    team_name_by_id[best_offense_by_id[0]]
+  def best_offense
+    best_offense_arr = avg_goals_per_game_by_team.max_by { |_id, goals| goals }
+    best_offense_id = best_offense_arr[0]
+    team_name_by_id[best_offense_id]
   end
 end
 
