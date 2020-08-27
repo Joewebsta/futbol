@@ -147,6 +147,29 @@ class StatTracker
     low_scoring_home_team_id = avg_goals_per_game_by_team(home_games).min_by { |_id, goals| goals }[0]
     team_name_by_id[low_scoring_home_team_id]
   end
+
+  def tot_wins_loses_by_team(type)
+    game_teams_data.sort_by { |game| game[:team_id].to_i }.each_with_object({}) do |game, hash|
+      hash.default = 0
+      hash[game[:team_id]] += 1 if game[:result] == type
+    end
+  end
+
+  def win_percent_by_team
+    tot_wins = tot_wins_loses_by_team('WIN')
+    tot_games = tot_games_by_team(game_teams_data)
+
+    tot_wins.each_with_object({}) do |team_id_wins_arr, hash|
+      team_id = team_id_wins_arr[0]
+      hash[team_id] = (tot_wins[team_id] / tot_games[team_id].to_f).round(2)
+    end
+  end
+
+  def winningest_coach
+    winningest_team_id = win_percent_by_team.max_by { |_id, win_percent| win_percent }[0]
+    game_teams_data.find { |game| game[:team_id] == winningest_team_id }[:head_coach]
+  end
+  # Can I refactor any methods above to use find?
 end
 
 game_path = './data/games.csv'
@@ -175,3 +198,5 @@ stat_tracker = StatTracker.from_csv(locations)
 # pp "Lowest scoring visitor: #{stat_tracker.lowest_scoring_visitor}"
 # pp "Highest scoring home team: #{stat_tracker.highest_scoring_home_team}"
 # pp "Lowest scoring home team: #{stat_tracker.lowest_scoring_home_team}"
+# puts '_______________________________'
+# pp "Winningest coach: #{stat_tracker.winningest_coach}"
