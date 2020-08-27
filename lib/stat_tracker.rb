@@ -93,11 +93,11 @@ class StatTracker
     end
   end
 
-  def avg_goals_per_game_by_team
-    tot_goals_by_team(game_teams_data).each_with_object({}) do |team_id_goals, hash|
+  def avg_goals_per_game_by_team(data)
+    tot_goals_by_team(data).each_with_object({}) do |team_id_goals, hash|
       team_id = team_id_goals[0]
       team_goals = team_id_goals[1].to_f
-      tot_team_games = tot_games_by_team(game_teams_data)[team_id]
+      tot_team_games = tot_games_by_team(data)[team_id]
 
       hash[team_id] = (team_goals / tot_team_games).round(2)
     end
@@ -110,19 +110,25 @@ class StatTracker
   end
 
   def best_offense
-    best_offense_arr = avg_goals_per_game_by_team.max_by { |_id, goals| goals }
+    best_offense_arr = avg_goals_per_game_by_team(game_teams_data).max_by { |_id, goals| goals }
     best_offense_id = best_offense_arr[0]
     team_name_by_id[best_offense_id]
   end
 
   def worst_offense
-    worst_offense_arr = avg_goals_per_game_by_team.min_by { |_id, goals| goals }
+    worst_offense_arr = avg_goals_per_game_by_team(game_teams_data).min_by { |_id, goals| goals }
     worst_offense_id = worst_offense_arr[0]
     team_name_by_id[worst_offense_id]
   end
 
   def filter_by_hoa(type)
     game_teams_data.select { |game| game[:hoa] == type }
+  end
+
+  def highest_scoring_visitor
+    away_games_arr = filter_by_hoa('away')
+    highest_scoring_visitor_by_id = avg_goals_per_game_by_team(away_games_arr).max_by { |_id, goals| goals }[0]
+    team_name_by_id[highest_scoring_visitor_by_id]
   end
 end
 
@@ -147,4 +153,6 @@ stat_tracker = StatTracker.from_csv(locations)
 # pp "Avg goals by season: #{stat_tracker.average_goals_by_season}"
 # pp "Best offense: #{stat_tracker.best_offense}"
 # pp "Worst offense: #{stat_tracker.worst_offense}"
-pp stat_tracker.filter_by_hoa('home')
+# pp
+# pp stat_tracker.filter_by_hoa('home')
+pp stat_tracker.highest_scoring_visitor
