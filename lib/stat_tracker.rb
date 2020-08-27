@@ -130,6 +130,12 @@ class StatTracker
     highest_scoring_visitor_by_id = avg_goals_per_game_by_team(away_games_arr).max_by { |_id, goals| goals }[0]
     team_name_by_id[highest_scoring_visitor_by_id]
   end
+
+  def lowest_scoring_visitor
+    away_games_arr = filter_by_hoa('away')
+    lowest_scoring_visitor_by_id = avg_goals_per_game_by_team(away_games_arr).min_by { |_id, goals| goals }[0]
+    team_name_by_id[lowest_scoring_visitor_by_id]
+  end
 end
 
 game_path = './data/games.csv'
@@ -151,8 +157,8 @@ stat_tracker = StatTracker.from_csv(locations)
 # pp "Count of games by season: #{stat_tracker.count_of_games_by_season}"
 # pp "Avg goals per game: #{stat_tracker.average_goals_per_game}"
 # pp "Avg goals by season: #{stat_tracker.average_goals_by_season}"
+# puts '_______________________________'
 # pp "Best offense: #{stat_tracker.best_offense}"
 # pp "Worst offense: #{stat_tracker.worst_offense}"
-# pp
-# pp stat_tracker.filter_by_hoa('home')
-pp stat_tracker.highest_scoring_visitor
+# pp "Highest scoring visitor: #{stat_tracker.highest_scoring_visitor}"
+# pp "Lowest scoring visitor: #{stat_tracker.lowest_scoring_visitor}"
