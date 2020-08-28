@@ -203,10 +203,15 @@ class StatTracker
   end
 
   def tackles_by_team
-    game_teams_data.each_with_object({}) do |game, hash|
+    game_teams_data.sort_by { |game| game[:team_id].to_i }.each_with_object({}) do |game, hash|
       hash.default = 0
       hash[game[:team_id]] += game[:tackles].to_i
     end
+  end
+
+  def most_tackles
+    most_tackles_team_id = tackles_by_team.max_by { |tackles| tackles[1] }[0]
+    team_name_by_id[most_tackles_team_id]
   end
 
   # Can I refactor any methods above to use find?
@@ -244,3 +249,4 @@ stat_tracker = StatTracker.from_csv(locations)
 # pp "Most accurate team: #{stat_tracker.most_accurate_team}"
 # pp "Least accurate team: #{stat_tracker.least_accurate_team}"
 # pp stat_tracker.tackles_by_team
+pp stat_tracker.most_tackles
