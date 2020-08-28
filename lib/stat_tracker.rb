@@ -174,6 +174,26 @@ class StatTracker
     worst_team_id = win_percent_by_team.min_by { |_id, win_percent| win_percent }[0]
     game_teams_data.find { |game| game[:team_id] == worst_team_id }[:head_coach]
   end
+
+  def team_ids
+    game_teams_data.map { |game| game[:team_id] }.sort_by(&:to_i).uniq
+  end
+
+  def tot_shots_by_team
+    game_teams_data.each_with_object({}) do |game, hash|
+      hash.default = 0
+      hash[game[:team_id]] += game[:shots].to_i
+    end
+  end
+
+  def accuracy_by_team
+    team_ids.each_with_object({}) do |id, hash|
+      hash[id] = (tot_goals_by_team(game_teams_data)[id] / tot_shots_by_team[id].to_f).round(2)
+    end
+  end
+
+  def most_accurate_team; end
+
   # Can I refactor any methods above to use find?
 end
 
@@ -205,4 +225,5 @@ stat_tracker = StatTracker.from_csv(locations)
 # pp "Lowest scoring home team: #{stat_tracker.lowest_scoring_home_team}"
 # puts '_______________________________'
 # pp "Winningest coach: #{stat_tracker.winningest_coach}"
-pp "Worst coach: #{stat_tracker.worst_coach}"
+# pp "Worst coach: #{stat_tracker.worst_coach}"
+pp stat_tracker.most_accurate_team
