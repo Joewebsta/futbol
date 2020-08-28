@@ -188,11 +188,14 @@ class StatTracker
 
   def accuracy_by_team
     team_ids.each_with_object({}) do |id, hash|
-      hash[id] = (tot_goals_by_team(game_teams_data)[id] / tot_shots_by_team[id].to_f).round(2)
+      hash[id] = (tot_goals_by_team(game_teams_data)[id] / tot_shots_by_team[id].to_f).round(3)
     end
   end
 
-  def most_accurate_team; end
+  def most_accurate_team
+    most_accurate_team = accuracy_by_team.max_by { |id_accuracy| id_accuracy[1] }[0]
+    team_name_by_id[most_accurate_team]
+  end
 
   # Can I refactor any methods above to use find?
 end
