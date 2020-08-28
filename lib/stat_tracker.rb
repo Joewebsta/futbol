@@ -197,6 +197,11 @@ class StatTracker
     team_name_by_id[most_accurate_team]
   end
 
+  def least_accurate_team
+    least_accurate_team = accuracy_by_team.min_by { |id_accuracy| id_accuracy[1] }[0]
+    team_name_by_id[least_accurate_team]
+  end
+
   # Can I refactor any methods above to use find?
 end
 
@@ -229,4 +234,5 @@ stat_tracker = StatTracker.from_csv(locations)
 # puts '_______________________________'
 # pp "Winningest coach: #{stat_tracker.winningest_coach}"
 # pp "Worst coach: #{stat_tracker.worst_coach}"
-pp stat_tracker.most_accurate_team
+# pp "Most accurate team: #{stat_tracker.most_accurate_team}"
+# pp "Least accurate team: #{stat_tracker.least_accurate_team}"
