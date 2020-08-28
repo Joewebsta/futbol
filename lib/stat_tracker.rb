@@ -214,7 +214,10 @@ class StatTracker
     team_name_by_id[most_tackles_team_id]
   end
 
-  # Can I refactor any methods above to use find?
+  def fewest_tackles
+    fewest_tackles_team_id = tackles_by_team.min_by { |id_tackles_arr| id_tackles_arr[1] }[0]
+    team_name_by_id[fewest_tackles_team_id]
+  end
 end
 
 game_path = './data/games.csv'
@@ -250,3 +253,4 @@ stat_tracker = StatTracker.from_csv(locations)
 # pp "Least accurate team: #{stat_tracker.least_accurate_team}"
 # pp stat_tracker.tackles_by_team
 pp stat_tracker.most_tackles
+pp stat_tracker.fewest_tackles
