@@ -227,6 +227,38 @@ class StatTracker
     least_accurate_team = accuracy_by_team_season(season).min_by { |id_accuracy_arr| id_accuracy_arr[1] }[0]
     team_name_by_id[least_accurate_team]
   end
+
+  def tackles_by_team_season(season)
+    game_teams_data.each_with_object({}) do |game, hash|
+      hash.default = 0
+      hash[game[:team_id]] += game[:tackles].to_i if matches_season?(game, season)
+    end
+  end
+
+  def most_tackles(season)
+    most_tackles_team_id = tackles_by_team_season(season).max_by { |id_tackles_arr| id_tackles_arr[1] }[0]
+    team_name_by_id[most_tackles_team_id]
+  end
+
+  def fewest_tackles(season)
+    fewest_tackles_team_id = tackles_by_team_season(season).min_by { |id_tackles_arr| id_tackles_arr[1] }[0]
+    team_name_by_id[fewest_tackles_team_id]
+  end
+
+  def find_team(id)
+    team_data.find { |team| team[:team_id] == id.to_s }
+  end
+
+  def team_info(id)
+    team_data = find_team(id)
+    {
+      team_id: team_data[:team_id],
+      franchise_id: team_data[:franchiseid],
+      team_name: team_data[:teamname],
+      abbreviation: team_data[:abbreviation],
+      link: team_data[:link]
+    }
+  end
 end
 
 game_path = './data/games.csv'
@@ -240,12 +272,17 @@ locations = {
 }
 
 stat_tracker = StatTracker.from_csv(locations)
-pp stat_tracker.least_accurate_team('20122013')
-pp stat_tracker.least_accurate_team('20132014')
-pp stat_tracker.least_accurate_team('20142015')
-pp stat_tracker.least_accurate_team('20152016')
+pp stat_tracker.fewest_tackles('20122013')
+2.times { puts '**' }
+pp stat_tracker.fewest_tackles('20132014')
+2.times { puts '**' }
+pp stat_tracker.fewest_tackles('20142015')
+2.times { puts '**' }
+pp stat_tracker.fewest_tackles('20152016')
+2.times { puts '**' }
+pp stat_tracker.fewest_tackles('20162017')
+# pp stat_tracker.least_accurate_team('20152016')
 # pp stat_tracker.tot_goals_by_team_season('20122013').count
-# 2.times { puts '**' }
 # pp stat_tracker.tot_shots_by_team_season('20122013').count
 
 # pp "Highest total score: #{stat_tracker.highest_total_score}"
