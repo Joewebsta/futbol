@@ -184,6 +184,11 @@ class StatTracker
     winningest_team_id = win_percent_by_team_season(season).max_by { |_id, win_percent| win_percent }[0]
     game_teams_data.find { |game| game[:team_id] == winningest_team_id }[:head_coach]
   end
+
+  def worst_coach(season)
+    worst_team_id = win_percent_by_team_season(season).min_by { |_id, win_percent| win_percent }[0]
+    game_teams_data.find { |game| game[:team_id] == worst_team_id }[:head_coach]
+  end
 end
 
 game_path = './data/games.csv'
@@ -197,6 +202,10 @@ locations = {
 }
 
 stat_tracker = StatTracker.from_csv(locations)
+pp stat_tracker.worst_coach('20122013')
+pp stat_tracker.worst_coach('20132014')
+pp stat_tracker.worst_coach('20142015')
+pp stat_tracker.worst_coach('20152016')
 
 # pp "Highest total score: #{stat_tracker.highest_total_score}"
 # pp "Lowest total score: #{stat_tracker.lowest_total_score}"
