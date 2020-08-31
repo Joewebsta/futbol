@@ -148,89 +148,29 @@ class StatTracker
     team_name_by_id[low_scoring_home_team_id]
   end
 
-  def tot_wins_loses_by_team(type)
-    game_teams_data.sort_by { |game| game[:team_id].to_i }.each_with_object({}) do |game, hash|
+  def filter_by_season(season)
+    game_data.select { |game| game[:season] = season }
+  end
+
+  def tot_wins_by_team(season)
+    filter_by_season(season).each_with_object({}) do |game, hash|
       hash.default = 0
-      hash[game[:team_id]] += 1 if game[:result] == type
+      hash[game[:home_team_id]] += 1 if game[:home_goals] < game[:away_goals]
     end
   end
 
-  def win_percent_by_team
-    tot_wins = tot_wins_loses_by_team('WIN')
-    tot_games = tot_games_by_team(game_teams_data)
+  def win_percent_by_team(season)
+    # pp season20122013 = filter_by_season(season)
+    tot_games = tot_games_by_team(filter_by_season(season))
 
-    team_ids.each_with_object({}) do |team_id, hash|
-      hash[team_id] = (tot_wins[team_id] / tot_games[team_id].to_f).round(2)
-    end
+    # team_ids.each_with_object({}) do |team_id, hash|
+    #   hash[team_id] = (tot_wins_by_team[team_id] / tot_games[team_id].to_f).round(2)
+    # end
   end
 
-  def winningest_coach
-    winningest_team_id = win_percent_by_team.max_by { |_id, win_percent| win_percent }[0]
+  def winningest_coach(season)
+    winningest_team_id = win_percent_by_team(season).max_by { |_id, win_percent| win_percent }[0]
     game_teams_data.find { |game| game[:team_id] == winningest_team_id }[:head_coach]
-  end
-
-  def worst_coach
-    worst_team_id = win_percent_by_team.min_by { |_id, win_percent| win_percent }[0]
-    game_teams_data.find { |game| game[:team_id] == worst_team_id }[:head_coach]
-  end
-
-  def team_ids
-    game_teams_data.map { |game| game[:team_id] }.sort_by(&:to_i).uniq
-  end
-
-  def tot_shots_by_team
-    game_teams_data.each_with_object({}) do |game, hash|
-      hash.default = 0
-      hash[game[:team_id]] += game[:shots].to_i
-    end
-  end
-
-  def accuracy_by_team
-    team_ids.each_with_object({}) do |id, hash|
-      hash[id] = (tot_goals_by_team(game_teams_data)[id] / tot_shots_by_team[id].to_f).round(3)
-    end
-  end
-
-  def most_accurate_team
-    most_accurate_team = accuracy_by_team.max_by { |id_accuracy| id_accuracy[1] }[0]
-    team_name_by_id[most_accurate_team]
-  end
-
-  def least_accurate_team
-    least_accurate_team = accuracy_by_team.min_by { |id_accuracy| id_accuracy[1] }[0]
-    team_name_by_id[least_accurate_team]
-  end
-
-  def tackles_by_team
-    game_teams_data.sort_by { |game| game[:team_id].to_i }.each_with_object({}) do |game, hash|
-      hash.default = 0
-      hash[game[:team_id]] += game[:tackles].to_i
-    end
-  end
-
-  def most_tackles
-    most_tackles_team_id = tackles_by_team.max_by { |tackles| tackles[1] }[0]
-    team_name_by_id[most_tackles_team_id]
-  end
-
-  def fewest_tackles
-    fewest_tackles_team_id = tackles_by_team.min_by { |id_tackles_arr| id_tackles_arr[1] }[0]
-    team_name_by_id[fewest_tackles_team_id]
-  end
-
-  def find_team(id)
-    team_data.find { |team| team[:team_id] == id.to_s }
-  end
-
-  def team_info(id)
-    team_data = find_team(id)
-    {
-      team_id: team_data[:team_id],
-      franchise_id: team_data[:franchiseid],
-      team_name: team_data[:teamname],
-      abbreviation: team_data[:abbreviation],
-      link: team_data[:link]
-    }
   end
 end
 
@@ -245,6 +185,8 @@ locations = {
 }
 
 stat_tracker = StatTracker.from_csv(locations)
+# pp stat_tracker.win_percent_by_team('20122013')
+pp stat_tracker.tot_wins_by_team('20122013')
 # pp "Highest total score: #{stat_tracker.highest_total_score}"
 # pp "Lowest total score: #{stat_tracker.lowest_total_score}"
 # pp "Percentage home wins: #{stat_tracker.percentage_home_wins}"
@@ -268,4 +210,4 @@ stat_tracker = StatTracker.from_csv(locations)
 # pp "Most tackles: #{stat_tracker.most_tackles}"
 # pp "Fewest tackles: #{stat_tracker.fewest_tackles}"
 # p stat_tracker.team_info(27)
-pp stat_tracker.win_percent_by_team
+# pp stat_tracker.filter_by_season('20122013')
