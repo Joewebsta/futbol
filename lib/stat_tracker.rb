@@ -152,6 +152,10 @@ class StatTracker
     game_data.select { |game| game[:season] = season }
   end
 
+  def team_ids
+    game_teams_data.map { |game| game[:team_id] }.sort_by(&:to_i).uniq
+  end
+
   def tot_wins_by_team_season(season)
     filter_by_season(season).each_with_object({}) do |game, hash|
       hash.default = 0
@@ -167,12 +171,12 @@ class StatTracker
   end
 
   def win_percent_by_team(season)
-    # pp season20122013 = filter_by_season(season)
-    tot_games = tot_games_by_team(filter_by_season(season))
+    tot_wins = tot_wins_by_team_season(season)
+    tot_games = tot_games_by_team_season(season)
 
-    # team_ids.each_with_object({}) do |team_id, hash|
-    #   hash[team_id] = (tot_wins_by_team[team_id] / tot_games[team_id].to_f).round(2)
-    # end
+    team_ids.each_with_object({}) do |team_id, hash|
+      hash[team_id] = (tot_wins[team_id] / tot_games[team_id].to_f).round(2)
+    end
   end
 
   def winningest_coach(season)
@@ -192,9 +196,9 @@ locations = {
 }
 
 stat_tracker = StatTracker.from_csv(locations)
-# pp stat_tracker.win_percent_by_team('20122013')
-pp stat_tracker.tot_wins_by_team_season('20122013')
-pp stat_tracker.tot_games_by_team_season('20122013')
+pp stat_tracker.win_percent_by_team('20122013')
+# pp stat_tracker.tot_wins_by_team_season('20122013')
+# pp stat_tracker.tot_games_by_team_season('20122013')
 
 # pp "Highest total score: #{stat_tracker.highest_total_score}"
 # pp "Lowest total score: #{stat_tracker.lowest_total_score}"
