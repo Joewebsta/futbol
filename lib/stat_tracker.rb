@@ -218,15 +218,15 @@ class StatTracker
     end
   end
 
-  #   def most_accurate_team
-  #     most_accurate_team = accuracy_by_team.max_by { |id_accuracy| id_accuracy[1] }[0]
-  #     team_name_by_id[most_accurate_team]
-  #   end
+  def most_accurate_team(season)
+    most_accurate_team = accuracy_by_team_season(season).max_by { |id_accuracy_arr| id_accuracy_arr[1] }[0]
+    team_name_by_id[most_accurate_team]
+  end
 
-  #   def least_accurate_team
-  #     least_accurate_team = accuracy_by_team.min_by { |id_accuracy| id_accuracy[1] }[0]
-  #     team_name_by_id[least_accurate_team]
-  #   end
+  def least_accurate_team(season)
+    least_accurate_team = accuracy_by_team_season(season).min_by { |id_accuracy_arr| id_accuracy_arr[1] }[0]
+    team_name_by_id[least_accurate_team]
+  end
 end
 
 game_path = './data/games.csv'
@@ -240,7 +240,10 @@ locations = {
 }
 
 stat_tracker = StatTracker.from_csv(locations)
-pp stat_tracker.accuracy_by_team_season('20122013')
+pp stat_tracker.least_accurate_team('20122013')
+pp stat_tracker.least_accurate_team('20132014')
+pp stat_tracker.least_accurate_team('20142015')
+pp stat_tracker.least_accurate_team('20152016')
 # pp stat_tracker.tot_goals_by_team_season('20122013').count
 # 2.times { puts '**' }
 # pp stat_tracker.tot_shots_by_team_season('20122013').count
