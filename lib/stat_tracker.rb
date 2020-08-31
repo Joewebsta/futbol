@@ -159,8 +159,7 @@ class StatTracker
     tot_wins = tot_wins_loses_by_team('WIN')
     tot_games = tot_games_by_team(game_teams_data)
 
-    tot_wins.each_with_object({}) do |team_id_wins_arr, hash|
-      team_id = team_id_wins_arr[0]
+    team_ids.each_with_object({}) do |team_id, hash|
       hash[team_id] = (tot_wins[team_id] / tot_games[team_id].to_f).round(2)
     end
   end
@@ -268,4 +267,5 @@ stat_tracker = StatTracker.from_csv(locations)
 # pp "Least accurate team: #{stat_tracker.least_accurate_team}"
 # pp "Most tackles: #{stat_tracker.most_tackles}"
 # pp "Fewest tackles: #{stat_tracker.fewest_tackles}"
-p stat_tracker.team_info(27)
+# p stat_tracker.team_info(27)
+pp stat_tracker.win_percent_by_team
