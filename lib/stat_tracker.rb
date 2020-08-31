@@ -152,10 +152,17 @@ class StatTracker
     game_data.select { |game| game[:season] = season }
   end
 
-  def tot_wins_by_team(season)
+  def tot_wins_by_team_season(season)
     filter_by_season(season).each_with_object({}) do |game, hash|
       hash.default = 0
       hash[game[:home_team_id]] += 1 if game[:home_goals] < game[:away_goals]
+    end
+  end
+
+  def tot_games_by_team_season(season)
+    filter_by_season(season).each_with_object({}) do |game, hash|
+      hash.default = 0
+      hash[game[:home_team_id]] += 1
     end
   end
 
@@ -186,7 +193,9 @@ locations = {
 
 stat_tracker = StatTracker.from_csv(locations)
 # pp stat_tracker.win_percent_by_team('20122013')
-pp stat_tracker.tot_wins_by_team('20122013')
+pp stat_tracker.tot_wins_by_team_season('20122013')
+pp stat_tracker.tot_games_by_team_season('20122013')
+
 # pp "Highest total score: #{stat_tracker.highest_total_score}"
 # pp "Lowest total score: #{stat_tracker.lowest_total_score}"
 # pp "Percentage home wins: #{stat_tracker.percentage_home_wins}"
