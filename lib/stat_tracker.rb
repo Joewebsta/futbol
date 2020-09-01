@@ -310,6 +310,16 @@ class StatTracker
     tot_games = tot_team_games_by_season(id).values.sum.to_f
     (tot_wins / tot_games).round(2)
   end
+
+  def most_goals_scored(id)
+    games = games_by_team_id(id)
+    games.max_by { |game| game[:goals] }[:goals].to_i
+  end
+
+  def fewest_goals_scored(id)
+    games = games_by_team_id(id)
+    games.min_by { |game| game[:goals] }[:goals].to_i
+  end
 end
 
 game_path = './data/games.csv'
@@ -354,3 +364,4 @@ stat_tracker = StatTracker.from_csv(locations)
 # pp stat_tracker.worst_season(23)
 # pp stat_tracker.average_win_percentage(23)
 # pp stat_tracker.team_win_percentage_by_season(23)
+pp stat_tracker.fewest_goals_scored(23)
