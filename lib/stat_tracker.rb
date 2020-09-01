@@ -245,12 +245,8 @@ class StatTracker
     team_name_by_id[fewest_tackles_team_id]
   end
 
-  def find_team(id)
-    team_data.find { |team| team[:team_id] == id.to_s }
-  end
-
   def team_info(id)
-    team_data = find_team(id)
+    team_data = team_data.find { |team| team[:team_id] == id.to_s }
     {
       team_id: team_data[:team_id],
       franchise_id: team_data[:franchiseid],
@@ -258,6 +254,29 @@ class StatTracker
       abbreviation: team_data[:abbreviation],
       link: team_data[:link]
     }
+  end
+
+  # def seasons
+  #   game_data.map { |game| game[:season] }.sort_by(&:to_i).uniq
+  # end
+
+  def games_by_team_id(id)
+    game_teams_data.find_all { |team| team[:team_id] == id.to_s }
+  end
+
+  def tot_games_by_season(id)
+    games = games_by_team_id(id)
+    games.each_with_object({}) do |game, hash|
+      hash.default = 0
+      start_year = game[:game_id][0..3]
+      end_year = start_year.next
+      season = start_year + end_year
+      hash[season] += 1
+    end
+  end
+
+  def best_season(id)
+    games = games_by_team_id(id)
   end
 end
 
@@ -272,19 +291,6 @@ locations = {
 }
 
 stat_tracker = StatTracker.from_csv(locations)
-pp stat_tracker.fewest_tackles('20122013')
-2.times { puts '**' }
-pp stat_tracker.fewest_tackles('20132014')
-2.times { puts '**' }
-pp stat_tracker.fewest_tackles('20142015')
-2.times { puts '**' }
-pp stat_tracker.fewest_tackles('20152016')
-2.times { puts '**' }
-pp stat_tracker.fewest_tackles('20162017')
-# pp stat_tracker.least_accurate_team('20152016')
-# pp stat_tracker.tot_goals_by_team_season('20122013').count
-# pp stat_tracker.tot_shots_by_team_season('20122013').count
-
 # pp "Highest total score: #{stat_tracker.highest_total_score}"
 # pp "Lowest total score: #{stat_tracker.lowest_total_score}"
 # pp "Percentage home wins: #{stat_tracker.percentage_home_wins}"
@@ -301,11 +307,13 @@ pp stat_tracker.fewest_tackles('20162017')
 # pp "Highest scoring home team: #{stat_tracker.highest_scoring_home_team}"
 # pp "Lowest scoring home team: #{stat_tracker.lowest_scoring_home_team}"
 # puts '_______________________________'
-# pp "Winningest coach: #{stat_tracker.winningest_coach}"
-# pp "Worst coach: #{stat_tracker.worst_coach}"
-# pp "Most accurate team: #{stat_tracker.most_accurate_team}"
-# pp "Least accurate team: #{stat_tracker.least_accurate_team}"
-# pp "Most tackles: #{stat_tracker.most_tackles}"
-# pp "Fewest tackles: #{stat_tracker.fewest_tackles}"
-# p stat_tracker.team_info(27)
-# pp stat_tracker.filter_by_season('20122013')
+# pp "Winningest coach: #{stat_tracker.winningest_coach('20122013')}"
+# pp "Worst coach: #{stat_tracker.worst_coach('20122013')}"
+# pp "Most accurate team: #{stat_tracker.most_accurate_team('20122013')}"
+# pp "Least accurate team: #{stat_tracker.least_accurate_team('20122013')}"
+# pp "Most tackles: #{stat_tracker.most_tackles('20122013')}"
+# pp "Fewest tackles: #{stat_tracker.fewest_tackles('20122013')}"
+# puts '_______________________________'
+# pp stat_tracker.team_info(27)
+# pp stat_tracker.best_season(27)
+pp stat_tracker.tot_games_by_season(23)
