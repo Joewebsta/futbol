@@ -298,7 +298,7 @@ class StatTracker
   end
 
   def best_season(id)
-    games = games_by_team_id(id)
+    team_win_percentage_by_season(id).max_by { |team_win_percent_arr| team_win_percent_arr[1] }[0]
   end
 end
 
@@ -340,4 +340,4 @@ stat_tracker = StatTracker.from_csv(locations)
 # pp stat_tracker.best_season(27)
 # pp stat_tracker.tot_team_games_by_season(23)
 # pp stat_tracker.tot_team_wins_by_season(23)
-pp stat_tracker.team_win_percentage_by_season(15)
+pp stat_tracker.best_season(23)
