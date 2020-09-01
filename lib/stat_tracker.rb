@@ -280,11 +280,20 @@ class StatTracker
   end
 
   def tot_team_wins_by_season(id)
-    games = games = games_by_team_id(id)
+    games = games_by_team_id(id)
     games.each_with_object({}) do |game, hash|
       hash.default = 0
       season = format_season(game)
       hash[season] += 1 if game[:result] == 'WIN'
+    end
+  end
+
+  def team_win_percentage_by_season(id)
+    tot_wins = tot_team_wins_by_season(id)
+    tot_games = tot_team_games_by_season(id)
+
+    seasons.each_with_object({}) do |season, hash|
+      hash[season] = (tot_wins[season] / tot_games[season].to_f).round(2)
     end
   end
 
@@ -329,5 +338,6 @@ stat_tracker = StatTracker.from_csv(locations)
 # puts '_______________________________'
 # pp stat_tracker.team_info(27)
 # pp stat_tracker.best_season(27)
-pp stat_tracker.tot_team_games_by_season(23)
-pp stat_tracker.tot_team_wins_by_season(23)
+# pp stat_tracker.tot_team_games_by_season(23)
+# pp stat_tracker.tot_team_wins_by_season(23)
+pp stat_tracker.team_win_percentage_by_season(15)
