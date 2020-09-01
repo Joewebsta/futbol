@@ -328,8 +328,8 @@ class StatTracker
   def wins_vs_opponents(id)
     home_and_away_games(id).each_with_object({}) do |game, hash|
       hash.default = 0
-      hash[game[:away_team_id]] += 1 if (game[:home_goals] > game[:away_goals]) && game[:away_team_id] != id.to_s
-      hash[game[:home_team_id]] += 1 if (game[:away_goals] > game[:home_goals]) && game[:home_team_id] != id.to_s
+      hash[game[:away_team_id]] += 1 if (game[:home_goals] < game[:away_goals]) && game[:away_team_id] != id.to_s
+      hash[game[:home_team_id]] += 1 if (game[:away_goals] < game[:home_goals]) && game[:home_team_id] != id.to_s
     end
   end
 
@@ -349,6 +349,16 @@ class StatTracker
       win_percent = (wins[team_id] / tot_games[team_id].to_f).round(2)
       hash[team_id] = win_percent unless win_percent.nan?
     end
+  end
+
+  def favorite_opponent(id)
+    team_id = win_percent_vs_opponents(id).min_by { |_id, win_percent| win_percent }[0]
+    team_name_by_id[team_id]
+  end
+
+  def rival(id)
+    team_id = win_percent_vs_opponents(id).max_by { |_id, win_percent| win_percent }[0]
+    team_name_by_id[team_id]
   end
 end
 
@@ -397,4 +407,5 @@ stat_tracker = StatTracker.from_csv(locations)
 # pp stat_tracker.wins_vs_opponents(23)
 # pp stat_tracker.tot_games_vs_opponents(23)
 pp stat_tracker.win_percent_vs_opponents(23)
-pp stat_tracker.win_percent_vs_opponents(24)
+pp stat_tracker.favorite_opponent(23)
+pp stat_tracker.rival(23)
