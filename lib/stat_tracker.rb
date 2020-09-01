@@ -341,7 +341,15 @@ class StatTracker
     end
   end
 
-  def win_percent_vs_opponents(id); end
+  def win_percent_vs_opponents(id)
+    wins = wins_vs_opponents(id)
+    tot_games = tot_games_vs_opponents(id)
+
+    team_ids.each_with_object({}) do |team_id, hash|
+      win_percent = (wins[team_id] / tot_games[team_id].to_f).round(2)
+      hash[team_id] = win_percent unless win_percent.nan?
+    end
+  end
 end
 
 game_path = './data/games.csv'
@@ -386,5 +394,7 @@ stat_tracker = StatTracker.from_csv(locations)
 # pp stat_tracker.worst_season(23)
 # pp stat_tracker.average_win_percentage(23)
 # pp stat_tracker.team_win_percentage_by_season(23)
-pp stat_tracker.wins_vs_opponents(23)
-pp stat_tracker.tot_games_vs_opponents(23)
+# pp stat_tracker.wins_vs_opponents(23)
+# pp stat_tracker.tot_games_vs_opponents(23)
+pp stat_tracker.win_percent_vs_opponents(23)
+pp stat_tracker.win_percent_vs_opponents(24)
