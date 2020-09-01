@@ -256,22 +256,35 @@ class StatTracker
     }
   end
 
-  # def seasons
-  #   game_data.map { |game| game[:season] }.sort_by(&:to_i).uniq
-  # end
+  def seasons
+    game_data.map { |game| game[:season] }.sort_by(&:to_i).uniq
+  end
 
   def games_by_team_id(id)
     game_teams_data.find_all { |team| team[:team_id] == id.to_s }
   end
 
-  def tot_games_by_season(id)
+  def format_season(game)
+    start_year = game[:game_id][0..3]
+    end_year = start_year.next
+    start_year + end_year
+  end
+
+  def tot_team_games_by_season(id)
     games = games_by_team_id(id)
     games.each_with_object({}) do |game, hash|
       hash.default = 0
-      start_year = game[:game_id][0..3]
-      end_year = start_year.next
-      season = start_year + end_year
+      season = format_season(game)
       hash[season] += 1
+    end
+  end
+
+  def tot_team_wins_by_season(id)
+    games = games = games_by_team_id(id)
+    games.each_with_object({}) do |game, hash|
+      hash.default = 0
+      season = format_season(game)
+      hash[season] += 1 if game[:result] == 'WIN'
     end
   end
 
@@ -316,4 +329,5 @@ stat_tracker = StatTracker.from_csv(locations)
 # puts '_______________________________'
 # pp stat_tracker.team_info(27)
 # pp stat_tracker.best_season(27)
-pp stat_tracker.tot_games_by_season(23)
+pp stat_tracker.tot_team_games_by_season(23)
+pp stat_tracker.tot_team_wins_by_season(23)
