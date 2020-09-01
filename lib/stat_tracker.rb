@@ -320,6 +320,19 @@ class StatTracker
     games = games_by_team_id(id)
     games.min_by { |game| game[:goals] }[:goals].to_i
   end
+
+  def wins_vs_opponents(id)
+    games = game_data.find_all { |game| game[:home_team_id] == id.to_s || game[:away_team_id] == id.to_s }
+    games.each_with_object({}) do |game, hash|
+      hash.default = 0
+      hash[game[:away_team_id]] += 1 if game[:home_team_id] == id.to_s && (game[:home_goals] > game[:away_goals])
+      hash[game[:home_team_id]] += 1 if game[:away_team_id] == id.to_s && (game[:away_goals] > game[:home_goals])
+    end
+  end
+
+  def tot_games_vs_opponents(id); end
+
+  def win_percent_vs_opponents(id); end
 end
 
 game_path = './data/games.csv'
@@ -364,4 +377,4 @@ stat_tracker = StatTracker.from_csv(locations)
 # pp stat_tracker.worst_season(23)
 # pp stat_tracker.average_win_percentage(23)
 # pp stat_tracker.team_win_percentage_by_season(23)
-pp stat_tracker.fewest_goals_scored(23)
+pp stat_tracker.wins_vs_opponents(23)
