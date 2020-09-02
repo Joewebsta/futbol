@@ -156,56 +156,37 @@ class StatTracker
     game_teams_data.find_all { |game| game[:game_id][0..3] == season[0..3] }
   end
 
-  def tot_wins_by_team_season(season)
+  def tot_wins_by_coach_season(season)
     filter_by_season(season).each_with_object({}) do |game, hash|
       hash.default = 0
-      hash[game[:team_id]] += 1 if game[:result] == 'WIN'
+      hash[game[:head_coach]] += 1 if game[:result] == 'WIN'
     end
   end
 
-  def tot_games_by_team_season(season)
+  def tot_games_by_coach_season(season)
     filter_by_season(season).each_with_object({}) do |game, hash|
       hash.default = 0
-      hash[game[:team_id]] += 1
+      hash[game[:head_coach]] += 1
     end
   end
 
-  # def filter_by_season(season)
-  #   game_data.select { |game| game[:season] == season }
-  # end
+  def win_percent_by_coach_season(season)
+    tot_wins = tot_wins_by_coach_season(season)
+    tot_games = tot_games_by_coach_season(season)
 
-  # def tot_wins_by_team_season(season)
-  #   filter_by_season(season).each_with_object({}) do |game, hash|
-  #     hash.default = 0
-  #     hash[game[:home_team_id]] += 1 if game[:home_goals] > game[:away_goals]
-  #   end
-  # end
-
-  # def tot_games_by_team_season(season)
-  #   filter_by_season(season).each_with_object({}) do |game, hash|
-  #     hash.default = 0
-  #     hash[game[:home_team_id]] += 1
-  #   end
-  # end
-
-  # def win_percent_by_team_season(season)
-  #   tot_wins = tot_wins_by_team_season(season)
-  #   tot_games = tot_games_by_team_season(season)
-
-  #   team_ids.each_with_object({}) do |team_id, hash|
-  #     win_percent = (tot_wins[team_id] / tot_games[team_id].to_f).round(2)
-  #     hash[team_id] = win_percent unless win_percent.nan?
-  #   end
-  # end
+    tot_games.each_with_object({}) do |coach_games_arr, hash|
+      coach = coach_games_arr[0]
+      win_percent = (tot_wins[coach] / tot_games[coach].to_f).round(3)
+      hash[coach] = win_percent unless win_percent.nan?
+    end
+  end
 
   def winningest_coach(season)
-    winningest_team_id = win_percent_by_team_season(season).max_by { |_id, win_percent| win_percent }
-    # game_teams_data.find { |game| game[:team_id] == winningest_team_id }[:head_coach]
+    win_percent_by_coach_season(season).max_by { |_name, win_percent| win_percent }[0]
   end
 
   def worst_coach(season)
-    worst_team_id = win_percent_by_team_season(season).min_by { |_id, win_percent| win_percent }
-    # game_teams_data.find { |game| game[:team_id] == worst_team_id }[:head_coach]
+    win_percent_by_coach_season(season).min_by { |_name, win_percent| win_percent }[0]
   end
 
   def matches_season?(game, season)
@@ -406,11 +387,11 @@ stat_tracker = StatTracker.from_csv(locations)
 # pp "Lowest scoring visitor: #{stat_tracker.lowest_scoring_visitor}"
 # pp "Highest scoring home team: #{stat_tracker.highest_scoring_home_team}"
 # pp "Lowest scoring home team: #{stat_tracker.lowest_scoring_home_team}"
-# puts '_______________________________'
-# FIX ME -- pp "Winningest coach: #{stat_tracker.winningest_coach('20132014')}"
-# FIX ME -- pp "Winningest coach: #{stat_tracker.winningest_coach('20142015')}"
-# FIX ME -- pp "Worst coach: #{stat_tracker.worst_coach('20132014')}"
-# FIX ME -- pp "Worst coach: #{stat_tracker.worst_coach('20142015')}"
+# # puts '_______________________________'
+# pp "Winningest coach: #{stat_tracker.winningest_coach('20132014')}"
+# pp "Winningest coach: #{stat_tracker.winningest_coach('20142015')}"
+# pp "Worst coach: #{stat_tracker.worst_coach('20132014')}"
+# pp "Worst coach: #{stat_tracker.worst_coach('20142015')}"
 # pp "Most accurate team: #{stat_tracker.most_accurate_team('20132014')}"
 # pp "Most accurate team: #{stat_tracker.most_accurate_team('20142015')}"
 # pp "Least accurate team: #{stat_tracker.least_accurate_team('20132014')}"
@@ -428,8 +409,3 @@ stat_tracker = StatTracker.from_csv(locations)
 # pp stat_tracker.fewest_goals_scored(18)
 # FIX ME -- pp stat_tracker.favorite_opponent(23)
 # FIX ME -- pp stat_tracker.rival(23)
-
-# pp stat_tracker.win_percent_by_team_season('20132014')
-# pp stat_tracker.filter_by_season('20132014').count
-# pp stat_tracker.tot_wins_by_team_season('20132014')
-pp stat_tracker.tot_games_by_team_season('20132014')
