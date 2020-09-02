@@ -1,9 +1,10 @@
 require 'csv'
+require './lib/games_collection'
 
 class StatTracker
   def self.from_csv(locations)
     raw_data = {}
-    raw_data[:game_data] = CSV.read(locations[:games], headers: true, header_converters: :symbol)
+    raw_data[:game_data] = GamesCollection.new(locations[:games])
     raw_data[:team_data] = CSV.read(locations[:teams], headers: true, header_converters: :symbol)
     raw_data[:game_teams_data] = CSV.read(locations[:game_teams], headers: true, header_converters: :symbol)
     StatTracker.new(raw_data)
@@ -12,9 +13,10 @@ class StatTracker
   attr_reader :game_data, :team_data, :game_teams_data
 
   def initialize(raw_data)
-    @game_data = raw_data[:game_data]
+    @game_data = raw_data[:game_data].games
     @team_data = raw_data[:team_data]
     @game_teams_data = raw_data[:game_teams_data]
+    # require 'pry'; binding.pry
   end
 
   def highest_total_score
@@ -372,8 +374,8 @@ locations = {
 }
 
 stat_tracker = StatTracker.from_csv(locations)
-# pp "Highest total score: #{stat_tracker.highest_total_score}"
-# pp "Lowest total score: #{stat_tracker.lowest_total_score}"
+pp "Highest total score: #{stat_tracker.highest_total_score}"
+pp "Lowest total score: #{stat_tracker.lowest_total_score}"
 # pp "Percentage home wins: #{stat_tracker.percentage_home_wins}"
 # pp "Percentage visitor wins: #{stat_tracker.percentage_visitor_wins}"
 # pp "Percentage ties: #{stat_tracker.percentage_ties}"
