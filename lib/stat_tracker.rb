@@ -163,6 +163,13 @@ class StatTracker
     end
   end
 
+  def tot_games_by_team_season(season)
+    filter_by_season(season).each_with_object({}) do |game, hash|
+      hash.default = 0
+      hash[game[:team_id]] += 1
+    end
+  end
+
   # def filter_by_season(season)
   #   game_data.select { |game| game[:season] == season }
   # end
@@ -424,4 +431,5 @@ stat_tracker = StatTracker.from_csv(locations)
 
 # pp stat_tracker.win_percent_by_team_season('20132014')
 # pp stat_tracker.filter_by_season('20132014').count
-pp stat_tracker.tot_wins_by_team_season('20132014')
+# pp stat_tracker.tot_wins_by_team_season('20132014')
+pp stat_tracker.tot_games_by_team_season('20132014')
