@@ -2,24 +2,24 @@ require 'csv'
 require './lib/games_collection'
 
 class StatTracker
-  def self.from_csv(locations)
-    raw_data = {}
-    raw_data[:game_data] = GamesCollection.new(locations[:games])
-    raw_data[:team_data] = CSV.read(locations[:teams], headers: true, header_converters: :symbol)
-    raw_data[:game_teams_data] = CSV.read(locations[:game_teams], headers: true, header_converters: :symbol)
-    StatTracker.new(raw_data)
+  attr_reader :games, :team_data, :game_teams_data
+
+  def initialize(data)
+    @games = data[:games]
+    @team_data = data[:teams]
+    @game_teams_data = data[:game_teams]
   end
 
-  attr_reader :game_data, :team_data, :game_teams_data
-
-  def initialize(raw_data)
-    @game_data = raw_data[:game_data].games
-    @team_data = raw_data[:team_data]
-    @game_teams_data = raw_data[:game_teams_data]
-    # require 'pry'; binding.pry
+  def self.from_csv(locations)
+    data = {}
+    data[:games] = GamesCollection.from_csv(locations[:games])
+    data[:teams] = CSV.read(locations[:teams], headers: true, header_converters: :symbol)
+    data[:game_teams] = CSV.read(locations[:game_teams], headers: true, header_converters: :symbol)
+    StatTracker.new(data)
   end
 
   def highest_total_score
+    require 'pry'; binding.pry
     game_data.map { |game| game[:away_goals].to_i + game[:home_goals].to_i }.max
   end
 
