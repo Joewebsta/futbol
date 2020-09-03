@@ -13,17 +13,17 @@ class StatTracker
 
   attr_reader :games, :team_data, :game_teams_data
 
-  def initialize(data)
-    @games = data[:games]
-    @team_data = data[:teams]
-    @game_teams_data = data[:game_teams]
-  end
-
   def self.from_csv(locations)
     data = {}
     data[:games] = GamesCollection.from_csv(locations[:games])
     data[:teams] = CSV.read(locations[:teams], headers: true, header_converters: :symbol)
     data[:game_teams] = CSV.read(locations[:game_teams], headers: true, header_converters: :symbol)
     StatTracker.new(data)
+  end
+
+  def initialize(data)
+    @games = data[:games]
+    @team_data = data[:teams]
+    @game_teams_data = data[:game_teams]
   end
 end
