@@ -1,23 +1,23 @@
 module SeasonStatistics
   def team_ids
-    game_teams_data.map { |game| game[:team_id] }.sort_by(&:to_i).uniq
+    game_teams.map(&:team_id).sort_by(&:to_i).uniq
   end
 
   def filter_by_season(season)
-    game_teams_data.find_all { |game| game[:game_id][0..3] == season[0..3] }
+    game_teams.find_all { |game| game.game_id[0..3] == season[0..3] }
   end
 
   def tot_wins_by_coach_season(season)
     filter_by_season(season).each_with_object({}) do |game, hash|
       hash.default = 0
-      hash[game[:head_coach]] += 1 if game[:result] == 'WIN'
+      hash[game.head_coach] += 1 if game.result == 'WIN'
     end
   end
 
   def tot_games_by_coach_season(season)
     filter_by_season(season).each_with_object({}) do |game, hash|
       hash.default = 0
-      hash[game[:head_coach]] += 1
+      hash[game.head_coach] += 1
     end
   end
 
@@ -41,20 +41,20 @@ module SeasonStatistics
   end
 
   def matches_season?(game, season)
-    game[:game_id][0..3] == season[0..3]
+    game.game_id[0..3] == season[0..3]
   end
 
   def tot_shots_by_team_season(season)
-    game_teams_data.each_with_object({}) do |game, hash|
+    game_teams.each_with_object({}) do |game, hash|
       hash.default = 0
-      hash[game[:team_id]] += game[:shots].to_i if matches_season?(game, season)
+      hash[game.team_id] += game.shots.to_i if matches_season?(game, season)
     end
   end
 
   def tot_goals_by_team_season(season)
-    game_teams_data.each_with_object({}) do |game, hash|
+    game_teams.each_with_object({}) do |game, hash|
       hash.default = 0
-      hash[game[:team_id]] += game[:goals].to_i if matches_season?(game, season)
+      hash[game.team_id] += game.goals.to_i if matches_season?(game, season)
     end
   end
 
@@ -79,9 +79,9 @@ module SeasonStatistics
   end
 
   def tackles_by_team_season(season)
-    game_teams_data.each_with_object({}) do |game, hash|
+    game_teams.each_with_object({}) do |game, hash|
       hash.default = 0
-      hash[game[:team_id]] += game[:tackles].to_i if matches_season?(game, season)
+      hash[game.team_id] += game.tackles.to_i if matches_season?(game, season)
     end
   end
 

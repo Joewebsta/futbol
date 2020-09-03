@@ -4,16 +4,16 @@ module LeagueStatistics
   end
 
   def tot_goals_by_team(data)
-    data.sort_by { |game| game[:team_id].to_i }.each_with_object({}) do |game, hash|
+    data.sort_by { |game| game.team_id.to_i }.each_with_object({}) do |game, hash|
       hash.default = 0
-      hash[game[:team_id]] += game[:goals].to_i
+      hash[game.team_id] += game.goals.to_i
     end
   end
 
   def tot_games_by_team(data)
-    data.sort_by { |game| game[:team_id].to_i }.each_with_object({}) do |game, hash|
+    data.sort_by { |game| game.team_id.to_i }.each_with_object({}) do |game, hash|
       hash.default = 0
-      hash[game[:team_id]] += 1
+      hash[game.team_id] += 1
     end
   end
 
@@ -34,19 +34,19 @@ module LeagueStatistics
   end
 
   def best_offense
-    best_offense_arr = avg_goals_per_game_by_team(game_teams_data).max_by { |_id, goals| goals }
+    best_offense_arr = avg_goals_per_game_by_team(game_teams).max_by { |_id, goals| goals }
     best_offense_id = best_offense_arr[0]
     team_name_by_id[best_offense_id]
   end
 
   def worst_offense
-    worst_offense_arr = avg_goals_per_game_by_team(game_teams_data).min_by { |_id, goals| goals }
+    worst_offense_arr = avg_goals_per_game_by_team(game_teams).min_by { |_id, goals| goals }
     worst_offense_id = worst_offense_arr[0]
     team_name_by_id[worst_offense_id]
   end
 
   def filter_by_hoa(type)
-    game_teams_data.select { |game| game[:hoa] == type }
+    game_teams.select { |game| game.hoa == type }
   end
 
   def highest_scoring_visitor

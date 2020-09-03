@@ -11,11 +11,11 @@ module TeamStatistics
   end
 
   def games_by_team_id(id)
-    game_teams_data.find_all { |team| team[:team_id] == id.to_s }
+    game_teams.find_all { |team| team.team_id == id.to_s }
   end
 
   def format_season(game)
-    start_year = game[:game_id][0..3]
+    start_year = game.game_id[0..3]
     end_year = start_year.next
     start_year + end_year
   end
@@ -34,7 +34,7 @@ module TeamStatistics
     games.each_with_object({}) do |game, hash|
       hash.default = 0
       season = format_season(game)
-      hash[season] += 1 if game[:result] == 'WIN'
+      hash[season] += 1 if game.result == 'WIN'
     end
   end
 
@@ -67,12 +67,12 @@ module TeamStatistics
 
   def most_goals_scored(id)
     games = games_by_team_id(id)
-    games.max_by { |game| game[:goals] }[:goals].to_i
+    games.max_by(&:goals).goals.to_i
   end
 
   def fewest_goals_scored(id)
     games = games_by_team_id(id)
-    games.min_by { |game| game[:goals] }[:goals].to_i
+    games.min_by(&:goals).goals.to_i
   end
 
   def home_and_away_games(id)
