@@ -1,6 +1,6 @@
 module LeagueStatistics
   def count_of_teams
-    team_data.by_col[0].count
+    teams.count
   end
 
   def tot_goals_by_team(data)
@@ -28,8 +28,8 @@ module LeagueStatistics
   end
 
   def team_name_by_id
-    team_data.sort_by { |row| row[:team_id].to_i }.each_with_object({}) do |row, hash|
-      hash[row[:team_id]] = row[:teamname]
+    teams.sort_by { |team| team.team_id.to_i }.each_with_object({}) do |team, hash|
+      hash[team.team_id] = team.team_name
     end
   end
 

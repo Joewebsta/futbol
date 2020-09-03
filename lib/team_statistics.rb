@@ -1,12 +1,12 @@
 module TeamStatistics
   def team_info(id)
-    team_information = team_data.find { |team| team[:team_id] == id.to_s }
+    team_information = teams.find { |team| team.team_id == id.to_s }
     {
-      team_id: team_information[:team_id],
-      franchise_id: team_information[:franchiseid],
-      team_name: team_information[:teamname],
-      abbreviation: team_information[:abbreviation],
-      link: team_information[:link]
+      team_id: team_information.team_id,
+      franchise_id: team_information.franchise_id,
+      team_name: team_information.team_name,
+      abbreviation: team_information.abbreviation,
+      link: team_information.link
     }
   end
 
