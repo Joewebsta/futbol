@@ -19,23 +19,22 @@ class StatTracker
   end
 
   def highest_total_score
-    require 'pry'; binding.pry
-    game_data.map { |game| game[:away_goals].to_i + game[:home_goals].to_i }.max
+    games.map { |game| game.away_goals + game.home_goals }.max
   end
 
   def lowest_total_score
-    game_data.map { |game| game[:away_goals].to_i + game[:home_goals].to_i }.min
+    games.map { |game| game.away_goals + game.home_goals }.min
   end
 
   def percentage_home_wins
-    tot_games = game_data.count
-    home_wins = game_data.select { |game| game[:home_goals] > game[:away_goals] }.count.to_f
+    tot_games = games.count
+    home_wins = games.select { |game| game.home_goals > game.away_goals }.count.to_f
     (home_wins / tot_games).round(2)
   end
 
   def percentage_visitor_wins
-    tot_games = game_data.count
-    visitor_wins = game_data.select { |game| game[:away_goals] > game[:home_goals] }.count.to_f
+    tot_games = games.count
+    visitor_wins = games.select { |game| game.away_goals > game.home_goals }.count.to_f
     (visitor_wins / tot_games).round(2)
   end
 
@@ -44,23 +43,23 @@ class StatTracker
   end
 
   def count_of_games_by_season
-    game_data.sort_by { |game| game[:season] }.each_with_object({}) do |game, hash|
+    games.sort_by(&:season).each_with_object({}) do |game, hash|
       hash.default = 0
-      hash[game[:season]] += 1
+      hash[game.season] += 1
     end
   end
 
   def count_of_goals_by_season
-    game_data.sort_by { |row| row[:season] }.each_with_object({}) do |row, hash|
+    games.sort_by(&:season).each_with_object({}) do |game, hash|
       hash.default = 0
-      hash[row[:season]] += (row[:away_goals].to_i + row[:home_goals].to_i)
+      hash[game.season] += (game.away_goals + game.home_goals)
     end
   end
 
   def average_goals_per_game
-    tot_games = game_data.count
-    tot_goals = game_data.reduce(0) do |goal_count, game|
-      goal_count + game[:away_goals].to_f + game[:home_goals].to_f
+    tot_games = games.count
+    tot_goals = games.reduce(0) do |goal_count, game|
+      goal_count + game.away_goals.to_f + game.home_goals.to_f
     end
 
     (tot_goals / tot_games).round(2)
@@ -75,6 +74,8 @@ class StatTracker
       hash[season] = (tot_goals[season].to_f / tot_games[season]).round(2)
     end
   end
+
+  # LEAGUE STATS ----------------------------------------------------------------
 
   def count_of_teams
     team_data.by_col[0].count
@@ -258,7 +259,7 @@ class StatTracker
   end
 
   def seasons
-    game_data.map { |game| game[:season] }.sort_by(&:to_i).uniq
+    games.map(&:season).sort_by(&:to_i).uniq
   end
 
   def games_by_team_id(id)
@@ -323,22 +324,22 @@ class StatTracker
   end
 
   def home_and_away_games(id)
-    game_data.find_all { |game| game[:home_team_id] == id.to_s || game[:away_team_id] == id.to_s }
+    games.find_all { |game| game.home_team_id == id.to_s || game.away_team_id == id.to_s }
   end
 
   def wins_vs_opponents(id)
     home_and_away_games(id).each_with_object({}) do |game, hash|
       hash.default = 0
-      hash[game[:away_team_id]] += 1 if (game[:home_goals] < game[:away_goals]) && game[:away_team_id] != id.to_s
-      hash[game[:home_team_id]] += 1 if (game[:away_goals] < game[:home_goals]) && game[:home_team_id] != id.to_s
+      hash[game.away_team_id] += 1 if (game.home_goals < game.away_goals) && game.away_team_id != id.to_s
+      hash[game.home_team_id] += 1 if (game.away_goals < game.home_goals) && game.home_team_id != id.to_s
     end
   end
 
   def tot_games_vs_opponents(id)
     home_and_away_games(id).each_with_object({}) do |game, hash|
       hash.default = 0
-      hash[game[:away_team_id]] += 1 unless game[:away_team_id] == id.to_s
-      hash[game[:home_team_id]] += 1 unless game[:home_team_id] == id.to_s
+      hash[game.away_team_id] += 1 unless game.away_team_id == id.to_s
+      hash[game.home_team_id] += 1 unless game.home_team_id == id.to_s
     end
   end
 
@@ -376,38 +377,38 @@ locations = {
 stat_tracker = StatTracker.from_csv(locations)
 pp "Highest total score: #{stat_tracker.highest_total_score}"
 pp "Lowest total score: #{stat_tracker.lowest_total_score}"
-# pp "Percentage home wins: #{stat_tracker.percentage_home_wins}"
-# pp "Percentage visitor wins: #{stat_tracker.percentage_visitor_wins}"
-# pp "Percentage ties: #{stat_tracker.percentage_ties}"
-# pp "Count of games by season: #{stat_tracker.count_of_games_by_season}"
-# pp "Avg goals per game: #{stat_tracker.average_goals_per_game}"
-# p "Avg goals by season: #{stat_tracker.average_goals_by_season}"
+pp "Percentage home wins: #{stat_tracker.percentage_home_wins}"
+pp "Percentage visitor wins: #{stat_tracker.percentage_visitor_wins}"
+pp "Percentage ties: #{stat_tracker.percentage_ties}"
+pp "Count of games by season: #{stat_tracker.count_of_games_by_season}"
+pp "Avg goals per game: #{stat_tracker.average_goals_per_game}"
+p "Avg goals by season: #{stat_tracker.average_goals_by_season}"
+puts '_______________________________'
+pp "Best offense: #{stat_tracker.best_offense}"
+pp "Worst offense: #{stat_tracker.worst_offense}"
+pp "Highest scoring visitor: #{stat_tracker.highest_scoring_visitor}"
+pp "Lowest scoring visitor: #{stat_tracker.lowest_scoring_visitor}"
+pp "Highest scoring home team: #{stat_tracker.highest_scoring_home_team}"
+pp "Lowest scoring home team: #{stat_tracker.lowest_scoring_home_team}"
 # puts '_______________________________'
-# pp "Best offense: #{stat_tracker.best_offense}"
-# pp "Worst offense: #{stat_tracker.worst_offense}"
-# pp "Highest scoring visitor: #{stat_tracker.highest_scoring_visitor}"
-# pp "Lowest scoring visitor: #{stat_tracker.lowest_scoring_visitor}"
-# pp "Highest scoring home team: #{stat_tracker.highest_scoring_home_team}"
-# pp "Lowest scoring home team: #{stat_tracker.lowest_scoring_home_team}"
-# # puts '_______________________________'
-# pp "Winningest coach: #{stat_tracker.winningest_coach('20132014')}"
-# pp "Winningest coach: #{stat_tracker.winningest_coach('20142015')}"
-# pp "Worst coach: #{stat_tracker.worst_coach('20132014')}"
-# pp "Worst coach: #{stat_tracker.worst_coach('20142015')}"
-# pp "Most accurate team: #{stat_tracker.most_accurate_team('20132014')}"
-# pp "Most accurate team: #{stat_tracker.most_accurate_team('20142015')}"
-# pp "Least accurate team: #{stat_tracker.least_accurate_team('20132014')}"
-# pp "Least accurate team: #{stat_tracker.least_accurate_team('20142015')}"
-# pp "Most tackles: #{stat_tracker.most_tackles('20132014')}"
-# pp "Most tackles: #{stat_tracker.most_tackles('20142015')}"
-# pp "Fewest tackles: #{stat_tracker.fewest_tackles('20132014')}"
-# pp "Fewest tackles: #{stat_tracker.fewest_tackles('20142015')}"
-# puts '_______________________________'
-# pp stat_tracker.team_info(18)
-# pp stat_tracker.best_season(6)
-# pp stat_tracker.worst_season(6)
-# pp stat_tracker.average_win_percentage(6)
-# pp stat_tracker.most_goals_scored(18)
-# pp stat_tracker.fewest_goals_scored(18)
-# pp stat_tracker.favorite_opponent(18)
-# pp stat_tracker.rival(18)
+pp "Winningest coach: #{stat_tracker.winningest_coach('20132014')}"
+pp "Winningest coach: #{stat_tracker.winningest_coach('20142015')}"
+pp "Worst coach: #{stat_tracker.worst_coach('20132014')}"
+pp "Worst coach: #{stat_tracker.worst_coach('20142015')}"
+pp "Most accurate team: #{stat_tracker.most_accurate_team('20132014')}"
+pp "Most accurate team: #{stat_tracker.most_accurate_team('20142015')}"
+pp "Least accurate team: #{stat_tracker.least_accurate_team('20132014')}"
+pp "Least accurate team: #{stat_tracker.least_accurate_team('20142015')}"
+pp "Most tackles: #{stat_tracker.most_tackles('20132014')}"
+pp "Most tackles: #{stat_tracker.most_tackles('20142015')}"
+pp "Fewest tackles: #{stat_tracker.fewest_tackles('20132014')}"
+pp "Fewest tackles: #{stat_tracker.fewest_tackles('20142015')}"
+puts '_______________________________'
+pp stat_tracker.team_info(18)
+pp stat_tracker.best_season(6)
+pp stat_tracker.worst_season(6)
+pp stat_tracker.average_win_percentage(6)
+pp stat_tracker.most_goals_scored(18)
+pp stat_tracker.fewest_goals_scored(18)
+pp stat_tracker.favorite_opponent(18)
+pp stat_tracker.rival(18)
