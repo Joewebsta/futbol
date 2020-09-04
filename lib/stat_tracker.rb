@@ -1,4 +1,3 @@
-require 'csv'
 require './lib/games_collection'
 require './lib/teams_collection'
 require './lib/game_teams_collection'
@@ -21,7 +20,7 @@ class StatTracker
     data[:games] = GamesCollection.from_csv(locations[:games])
     data[:teams] = TeamsCollection.from_csv(locations[:teams])
     data[:game_teams] = GameTeamsCollection.from_csv(locations[:game_teams])
-    StatTracker.new(data)
+    new(data)
   end
 
   def initialize(data)

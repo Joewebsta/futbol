@@ -1,3 +1,4 @@
+require 'csv'
 require './lib/teams'
 
 class TeamsCollection
