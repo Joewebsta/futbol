@@ -1,10 +1,10 @@
 module GameStatistics
   def highest_total_score
-    games.map { |game| game.away_goals + game.home_goals }.max
+    all_total_scores.max
   end
 
   def lowest_total_score
-    games.map { |game| game.away_goals + game.home_goals }.min
+    all_total_scores.min
   end
 
   def percentage_home_wins
@@ -30,19 +30,9 @@ module GameStatistics
     end
   end
 
-  def count_of_goals_by_season
-    games.sort_by(&:season).each_with_object({}) do |game, hash|
-      hash.default = 0
-      hash[game.season] += (game.away_goals + game.home_goals)
-    end
-  end
-
   def average_goals_per_game
     tot_games = games.count
-    tot_goals = games.reduce(0) do |goal_count, game|
-      goal_count + game.away_goals.to_f + game.home_goals.to_f
-    end
-
+    tot_goals = all_total_scores.sum.to_f
     (tot_goals / tot_games).round(2)
   end
 
@@ -53,6 +43,19 @@ module GameStatistics
     tot_goals.each_with_object({}) do |season_goals_arr, hash|
       season = season_goals_arr[0]
       hash[season] = (tot_goals[season].to_f / tot_games[season]).round(2)
+    end
+  end
+
+  private
+
+  def all_total_scores
+    games.map { |game| game.away_goals + game.home_goals }
+  end
+
+  def count_of_goals_by_season
+    games.sort_by(&:season).each_with_object({}) do |game, hash|
+      hash.default = 0
+      hash[game.season] += (game.away_goals + game.home_goals)
     end
   end
 end
