@@ -1,21 +1,11 @@
-require 'csv'
+require './lib/collection'
 require './lib/teams'
 
-class TeamsCollection
-  attr_reader :collection
+class TeamsCollection < Collection
+  attr_reader :statistics
 
   def initialize
-    @collection = []
-  end
-
-  def self.from_csv(csv_location)
-    new_games_collection = new
-    new_games_collection.convert_csv(csv_location)
-    new_games_collection.collection
-  end
-
-  def convert_csv(csv_location)
-    teams = CSV.read(csv_location, headers: true, header_converters: :symbol)
-    teams.each { |row| collection << Teams.new(row) }
+    super
+    @statistics = Teams
   end
 end
