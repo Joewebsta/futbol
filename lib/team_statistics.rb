@@ -10,6 +10,40 @@ module TeamStatistics
     }
   end
 
+  def best_season(id)
+    team_win_percentage_by_season(id).max_by { |_team, win_percent| win_percent }[0]
+  end
+
+  def worst_season(id)
+    team_win_percentage_by_season(id).min_by { |_team, win_percent| win_percent }[0]
+  end
+
+  def average_win_percentage(id)
+    tot_wins = tot_team_wins_by_season(id).values.sum
+    tot_games = tot_team_games_by_season(id).values.sum.to_f
+    (tot_wins / tot_games).round(2)
+  end
+
+  def most_goals_scored(id)
+    games_by_team_id(id).max_by(&:goals).goals.to_i
+  end
+
+  def fewest_goals_scored(id)
+    games_by_team_id(id).min_by(&:goals).goals.to_i
+  end
+
+  def favorite_opponent(id)
+    team_id = win_percent_vs_opponents(id).min_by { |_id, win_percent| win_percent }[0]
+    team_name_by_id[team_id]
+  end
+
+  def rival(id)
+    team_id = win_percent_vs_opponents(id).max_by { |_id, win_percent| win_percent }[0]
+    team_name_by_id[team_id]
+  end
+
+  private
+
   def games_by_team_id(id)
     game_teams.find_all { |team| team.team_id == id.to_s }
   end
@@ -51,30 +85,6 @@ module TeamStatistics
     end
   end
 
-  def best_season(id)
-    team_win_percentage_by_season(id).max_by { |team_win_percent_arr| team_win_percent_arr[1] }[0]
-  end
-
-  def worst_season(id)
-    team_win_percentage_by_season(id).min_by { |team_win_percent_arr| team_win_percent_arr[1] }[0]
-  end
-
-  def average_win_percentage(id)
-    tot_wins = tot_team_wins_by_season(id).values.sum
-    tot_games = tot_team_games_by_season(id).values.sum.to_f
-    (tot_wins / tot_games).round(2)
-  end
-
-  def most_goals_scored(id)
-    games = games_by_team_id(id)
-    games.max_by(&:goals).goals.to_i
-  end
-
-  def fewest_goals_scored(id)
-    games = games_by_team_id(id)
-    games.min_by(&:goals).goals.to_i
-  end
-
   def home_and_away_games(id)
     games.find_all { |game| game.home_team_id == id.to_s || game.away_team_id == id.to_s }
   end
@@ -103,15 +113,5 @@ module TeamStatistics
       win_percent = (wins[team_id] / tot_games[team_id].to_f).round(2)
       hash[team_id] = win_percent unless win_percent.nan?
     end
-  end
-
-  def favorite_opponent(id)
-    team_id = win_percent_vs_opponents(id).min_by { |_id, win_percent| win_percent }[0]
-    team_name_by_id[team_id]
-  end
-
-  def rival(id)
-    team_id = win_percent_vs_opponents(id).max_by { |_id, win_percent| win_percent }[0]
-    team_name_by_id[team_id]
   end
 end
